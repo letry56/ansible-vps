@@ -1,0 +1,2 @@
+- name: Connect to hosts and perform basic checks
+  ansible.builtin.ping:

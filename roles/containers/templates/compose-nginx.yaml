@@ -1,0 +1,24 @@
+version: "3.8"
+
+networks:
+  internal_net:
+
+services:
+
+  nginxproxymanager:
+    image: jc21/nginx-proxy-manager
+    container_name: nginxproxymanager
+    restart: unless-stopped
+#    network_mode: host
+    networks:
+      - internal_net
+    ports:
+      - {{ nginx_http_port }}:80
+      - {{ nginx_https_port }}:443
+      - {{ nginx_ui_port }}:81
+    environment:
+      PUID: "{{ user_service_uid }}"
+      PGID: "{{ user_service_gid }}"
+    volumes:
+      - {{ docker_volumes_dir }}/nginxproxymanager/data:/data
+      - {{ docker_volumes_dir }}/nginxproxymanager/letsencrypt:/etc/letsencrypt

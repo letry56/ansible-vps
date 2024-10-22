@@ -1,0 +1,41 @@
+version: "3.8"
+
+networks:
+  internal_net:
+
+services:
+
+  nextcloud:
+    image: nextcloud
+    container_name: nextcloud
+    user: "{{ user_service_uid }}:{{ user_service_gid }}"
+    restart: always
+    networks:
+      - internal_net
+    ports:
+      - {{ nextcloud_port }}:80
+    volumes:
+#      -
+      - {{ docker_volumes_dir }}/nextcloud:/var/www/html
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PASSWORD: nextcloud
+      POSTGRES_DB: nextcloud
+      POSTGRES_USER: nextcloud
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    user: "{{ user_service_uid }}:{{ user_service_gid }}"
+    networks:
+      - internal_net
+    environment:
+      POSTGRES_PASSWORD: nextcloud
+      POSTGRES_DB: nextcloud
+      POSTGRES_USER: nextcloud
+    restart: always
+    ports:
+      - {{ postgres_port }}:5432
+    volumes:
+#      -
+      - {{ docker_volumes_dir }}/postgresql:/var/lib/postgresql/data

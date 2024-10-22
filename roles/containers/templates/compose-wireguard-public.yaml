@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+
+  wireguard-public:
+#    image: linuxserver/wireguard
+    image: linuxserver/wireguard:latest
+    container_name: wireguard-public
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - {{ docker_volumes_dir }}/wireguard/public/etc:/config
+#      - {{ docker_volumes_dir }}/wireguard/public/config:/config/wg_confs
+    environment:
+      PUID: "{{ user_service_uid }}"
+      PGID: "{{ user_service_gid }}"
+      PEERS: 1
+    ports:
+      # port for wireguard-ui. this must be set here as the `wireguard-ui` container joins the network of this container and hasn't its own network over which it could publish the ports
+      - {{ wireguard_public_ui_port }}:5000
+      # port of the wireguard server
+      - {{ wireguard_public_port }}:51820/udp
+
+  wireguard-public-ui:
+    image: ngoduykhanh/wireguard-ui
+    container_name: wireguard-public-ui
+    restart: unless-stopped
+    depends_on:
+      - wireguard-public
+    cap_add:
+      - NET_ADMIN
+    # use the network of the 'wireguard' service. this enables to show active clients in the status page
+    network_mode: service:wireguard-public
+    environment:
+      - WGUI_USERNAME=admin
+      - WGUI_PASSWORD=admin
+      - WGUI_MANAGE_START=true
+      - WGUI_MANAGE_RESTART=true
+#      - WGUI_CONFIG_FILE_PATH=/etc/wireguard/wg_confs/wg0.conf #must be that, but doesn't work
+#      - TELEGRAM_TOKEN=
+#      - WGUI_SERVER_INTERFACE_ADDRESSES=10.252.1.0/24
+#      - WGUI_DEFAULT_CLIENT_ALLOWED_IPS=0.0.0.0/0
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+    volumes:
+      - {{ docker_volumes_dir }}/wireguard/public/db:/app/db
+      - {{ docker_volumes_dir }}/wireguard/public/etc:/etc/wireguard

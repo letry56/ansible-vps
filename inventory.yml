@@ -1,0 +1,15 @@
+all:
+  vars:
+    ansible_host: 10.0.0.1
+    ansible_user: letry
+    ansible_password: 1q2w3e4r
+
+vps-stage-1:
+  hosts:
+    vps1:
+      ansible_port: 22
+
+vps-stage-2:
+  hosts:
+    vps2:
+      ansible_port: 130

@@ -1,0 +1,8 @@
+- name: Setting up environment
+  hosts: vps
+  vars_files:
+    - ../vars/default-vars.yml
+  become: true
+  roles:
+    - role: connect
+    - role: backup

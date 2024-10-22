@@ -1,0 +1,84 @@
+- name: Set the name of a sudo group
+  set_fact:
+    sudo_group: sudo
+
+- name: Ensure group 'docker' exists
+  group:
+    name: docker
+    gid: 2001
+    state: present
+
+# Service user
+
+- name: Ensure group '{{ user_name_service }}' exists
+  group:
+    name: "{{ user_name_service }}"
+    state: present
+
+- name: Create a login user
+  user:
+    name: "{{ user_name_service }}"
+    password: "{{ user_pass_service | password_hash('sha512') }}"
+    uid: 2000
+    groups: 
+      - "{{ sudo_group }}"
+      - docker
+      - users
+    state: present
+    append: true
+
+- name: Chmod the user '{{ user_name_service }}' home directory
+  file:
+    path: "/home/{{ user_name_service }}"
+    state: directory
+    mode: 0755
+    owner: "{{ user_name_service }}"
+    group: "{{ user_name_service }}"
+    recurse: yes
+
+# SSH user
+
+- name: Ensure group '{{ user_name }}' exists
+  group:
+    name: "{{ user_name }}"
+    state: present
+
+- name: Create a login user
+  user:
+    name: "{{ user_name }}"
+    password: "{{ user_pass | password_hash('sha512') }}"
+    groups:
+      - "{{ sudo_group }}"
+      - docker
+      - users
+    state: present
+    append: true
+
+- name: Chmod the user '{{ user_name }}' home directory
+  file:
+    path: "/home/{{ user_name }}"
+    state: directory
+    mode: 0755
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+    recurse: yes
+
+# passwordless sudo
+
+- name: Allow '{{ sudo_group }}' group to have passwordless sudo
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: "^%{{ sudo_group }}"
+    line: "%{{ sudo_group }} ALL=(ALL) NOPASSWD: ALL"
+    validate: "/usr/sbin/visudo -cf %s"
+
+- name: Copy the public SSH key 
+  authorized_key:
+    state: present
+    user: "{{ item }}"
+    key: "{{ lookup('file', ssh_public_key) }}"
+  loop:
+    - "{{ ansible_user }}"
+    - "{{ user_name }}"
+    - "{{ user_name_service }}"

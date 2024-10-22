@@ -1,0 +1,36 @@
+version: "3.8"
+
+networks:
+  grafana_prometheus_net:
+
+services:
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    user: "{{ user_service_uid }}:{{ user_service_gid }}"
+    networks:
+      - grafana_prometheus_net
+    ports:
+      - {{ grafana_port }}:3000
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: grafana
+    volumes:
+      - {{ docker_volumes_dir }}/grafana:/etc/grafana/provisioning/datasources
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    user: "{{ user_service_uid }}:{{ user_service_gid }}"
+    networks:
+      - grafana_prometheus_net
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - {{ prometheus_port }}:9090
+    restart: unless-stopped
+    volumes:
+      - {{ docker_volumes_dir }}/prometheus/conf:/etc/prometheus
+      - {{ docker_volumes_dir }}/prometheus/data:/prometheus

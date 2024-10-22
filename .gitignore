@@ -1,0 +1,8 @@
+target/
+.idea/
+*.iml
+.DS_Store
+roles/geerlingguy*
+backup/docker
+notes.txt
+backup

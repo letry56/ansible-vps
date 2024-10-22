@@ -1,0 +1,56 @@
+- name: Ensure ufw is installed
+  apt:
+    name: ufw
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Reset UFW to default
+  command: ufw --force reset
+
+- name: Disable and reload UFW
+  command: ufw disable
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+
+- name: Allow specified TCP ports
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop: "{{ firewall_allowed_tcp_ports }}"
+
+- name: Allow specified UDP ports
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: udp
+  loop: "{{ firewall_allowed_udp_ports }}"
+
+- name: Allow access for admin IPs to any open ports
+  community.general.ufw:
+    rule: allow
+    from: "{{ item }}"
+  loop: "{{ allowed_admin_ips }}"
+
+- name: Add additional iptables rules
+  command: "{{ item }}"
+  loop: "{{ firewall_additional_rules }}"
+  when: firewall_additional_rules is defined
+
+- name: Deny all other incoming connections to x-ui port
+  community.general.ufw:
+    rule: deny
+    port: "{{ x_ui_port }}"
+#    proto: tcp
+
+- name: Restart UFW to apply all rules
+  community.general.ufw:
+    state: reloaded
+
+- name: Ensure UFW is enabled to start at boot
+  systemd:
+    name: ufw
+    enabled: yes
+    state: started

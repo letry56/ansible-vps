@@ -1,0 +1,23 @@
+- name: Setting up environment, stage 1
+  hosts: vps-stage-1
+  vars_files:
+    - ../vars/default-vars.yml
+    - ../vars/vps-vars.yml
+  become: true
+  roles:
+    - role: connect
+    - role: system
+    - role: geerlingguy.security
+    - role: geerlingguy.docker
+
+- name: Setting up environment, stage 2
+  hosts: vps-stage-2
+  vars_files:
+    - ../vars/default-vars.yml
+    - ../vars/vps-vars.yml
+  become: true
+  roles:
+    - role: connect
+    - role: wireguard
+    - role: containers
+    - role: firewall

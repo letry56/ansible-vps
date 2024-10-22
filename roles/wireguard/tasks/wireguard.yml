@@ -1,0 +1,29 @@
+- name: Ensure resolvconf is installed
+  apt:
+    name: resolvconf
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Copy WireGuard config directory to remote machine
+  copy:
+    src: "{{ wireguard_src }}/"
+    dest: "{{ wireguard_dir }}"
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Install WireGuard package
+  ansible.builtin.package:
+    name: wireguard
+    state: present
+
+- name: Enable and start WireGuard service
+  ansible.builtin.systemd:
+    name: wg-quick@wg0
+    enabled: true
+    state: started
+
+- name: Reload WireGuard service to apply new configuration
+  ansible.builtin.systemd:
+    name: wg-quick@wg0
+    state: reloaded

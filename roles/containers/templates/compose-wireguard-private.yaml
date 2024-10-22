@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+
+  wireguard-private:
+    image: linuxserver/wireguard
+    container_name: wireguard-private
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - {{ docker_volumes_dir }}/wireguard/private/config:/config
+    environment:
+      PUID: "{{ user_service_uid }}"
+      PGID: "{{ user_service_gid }}"
+      PEERS: 1
+    network_mode: host # opening ports as container ports (5000, 51820)
+    ports:
+      # port for wireguard-ui. this must be set here as the `wireguard-ui` container joins the network of this container and hasn't its own network over which it could publish the ports
+      - {{ wireguard_private_ui_port }}:5000
+      # port of the wireguard server
+      - {{ wireguard_private_port }}:51820/udp
+
+  wireguard-private-ui:
+    image: ngoduykhanh/wireguard-ui
+    container_name: wireguard-private-ui
+    restart: unless-stopped
+    depends_on:
+      - wireguard-private
+    cap_add:
+      - NET_ADMIN
+    # use the network of the 'wireguard' service. this enables to show active clients in the status page
+    network_mode: service:wireguard-private
+    environment:
+      - WGUI_USERNAME=admin
+      - WGUI_PASSWORD=admin
+      - WGUI_MANAGE_START=true
+      - WGUI_MANAGE_RESTART=true
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+    volumes:
+      - {{ docker_volumes_dir }}/wireguard/private/db:/app/db
+      - {{ docker_volumes_dir }}/wireguard/private/etc:/etc/wireguard

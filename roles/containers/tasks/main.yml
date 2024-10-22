@@ -1,0 +1,36 @@
+- name: Make sure that the docker folders exists
+  file:
+    path: "{{ item }}"
+    owner: "{{ user_name_service }}"
+    group: docker
+    state: directory
+  loop:
+    - "{{ docker_volumes_dir }}"
+    - "/home/{{ user_name_service }}/templates"
+
+- name: Copy docker volumes to remote machine
+  copy:
+    src: "{{ docker_volumes_src }}/"
+    dest: "{{ docker_volumes_dir }}"
+
+- name: Set permissions recursively for a directory and its contents
+  file:
+    path: "{{ docker_volumes_dir }}"
+    state: directory
+    recurse: true
+    owner: "{{ user_name_service }}"
+    group: docker
+    mode: 0770
+
+- name: Copy the compose file
+  template:
+    src: "{{ role_path }}/templates/compose-{{ item }}.yaml"
+    dest: "/home/{{ user_name_service }}/templates/compose-{{ item }}.yaml"
+  loop: "{{ install_containers }}"
+
+- name: Docker-compose up
+  community.docker.docker_compose_v2:
+    project_src: "/home/{{ user_name_service }}/templates/"
+    files: "{{ install_containers | map('regex_replace', '^(.*)$', 'compose-\\1.yaml') | list }}"
+    pull: always
+    state: present

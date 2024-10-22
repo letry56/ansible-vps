@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+#  ubuntu:
+#    container_name: homelab
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#      args:
+#        - USER_NAME=letry
+#        - USER_PASSWORD=1q2w3e4r
+#    ports:
+#      - "22222:22" #ssh
+#      - "20002:9090" #prometheus
+#      - "20001:3000" #grafana
+#      - "20003:8080" #nextcloud
+#      - "20004:8080" #torrent
+##    volumes:
+##      - ./ssh:/root/.ssh  # Монтируем каталог с ключами SSH
+#    tty: true

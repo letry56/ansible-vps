@@ -1,0 +1,17 @@
+hostname: vpnlab
+user_name: letry
+user_pass: 1q2w3e4r
+user_pass_service: 1q2w3e4r
+ssh_public_key: /Users/letry/.ssh/hetzner.pub
+install_containers:
+  - x-ui
+
+# Firewall
+firewall_allowed_tcp_ports:
+  - "{{ x_ui_vpn_port }}"
+firewall_allowed_udp_ports:
+  - "{{ wireguard_private_port }}"
+allowed_admin_ips:
+  - "10.0.0.2/32"
+#  - "10.0.0.0/8"
+  - "fd00:abcd:1234:1::2/128"

@@ -1,0 +1,16 @@
+- name: Archive directory {{ docker_volumes_dir }} on remote machine
+  archive:
+    path: "{{ docker_volumes_dir }}"
+    dest: "/tmp/docker_volumes_archive.tar.gz"
+  delegate_to: homelab
+
+- name: Copy archive from remote machine to local
+  fetch:
+    src: "/tmp/docker_volumes_archive.tar.gz"
+    dest: "{{ docker_volumes_backup_dir }}"
+
+- name: Remove archive from remote machine
+  file:
+    path: "/tmp/docker_volumes_archive.tar.gz"
+    state: absent
+  delegate_to: homelab

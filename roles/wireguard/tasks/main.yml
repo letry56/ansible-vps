@@ -1,0 +1,2 @@
+- include_tasks: wireguard.yml
+- include_tasks: dns.yml

@@ -1,0 +1,74 @@
+# Misc
+project_root: /Users/letry/work/projects/homelab
+ssh_public_key: /Users/letry/.ssh/letry.pub
+user_name: letry
+user_pass: 1q2w3e4r
+user_name_service: lab
+user_pass_service: 1q2w3e4r
+hostname: laboratory
+user_service_uid: 2000
+user_service_gid: 2001
+timezone: UTC
+ansible_become_pass: "{{ user_pass }}"
+
+# Packages
+extra_packages:
+  - git
+
+# Security
+security_ssh_port: 130
+security_ssh_allowed_users:
+  - "{{ user_name }}"
+security_sudoers_passwordless:
+  - "{{ user_name }}"
+security_autoupdate_reboot: true
+security_autoupdate_reboot_time: "06:00"
+security_autoupdate_mail_to: "letry56@gmail.com"
+security_autoupdate_mail_on_error: false
+
+# Ports
+ssh_port: 130
+wireguard_private_port: 7100
+wireguard_private_ui_port: 7105
+wireguard_public_port: 7110
+wireguard_public_ui_port: 7115
+nginx_http_port: 80
+nginx_https_port: 443
+nginx_ui_port: 81
+nextcloud_port: 7120
+x_ui_port: 45600
+x_ui_vpn_port: 34731
+postgres_port: 7125
+grafana_port: 7130
+prometheus_port: 7135
+
+# Firewall
+firewall_allowed_tcp_ports:
+  - "{{ ssh_port }}"
+  - "{{ nginx_http_port }}"
+  - "{{ nginx_https_port }}"
+
+# Docker
+docker_install_compose: true
+docker_compose_version: "v2.24.5"
+docker_users:
+  - "{{ user_name_service }}"
+  - "{{ user_name }}"
+  - "{{ ansible_user }}"
+  - root
+
+#WireGuard
+wireguard_src: "{{ project_root }}/wireguard"
+wireguard_dir: /etc/wireguard
+
+# Containers
+docker_volumes_src: "{{ project_root }}/backup/docker"
+docker_volumes_dir: /etc/docker
+install_containers:
+  - wireguard-private
+  - wireguard-public
+  - nginx
+  - grafana-prometheus
+  - nextcloud
+docker_volumes_backup_dir: /Users/letry/Downloads
+
