@@ -8,10 +8,16 @@
     - "{{ docker_volumes_dir }}"
     - "/home/{{ user_name_service }}/templates"
 
+- name: Check if source directory exists
+  stat:
+    path: "{{ docker_volumes_src }}"
+  register: docker_volumes_src_exists
+
 - name: Copy docker volumes to remote machine
   copy:
     src: "{{ docker_volumes_src }}/"
     dest: "{{ docker_volumes_dir }}"
+  when: docker_volumes_src_exists.stat.exists
 
 - name: Set permissions recursively for a directory and its contents
   file:
