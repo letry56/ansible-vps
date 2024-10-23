@@ -14,6 +14,12 @@ Fill in the required values in `wireguard/wg0.conf`:
 - `<preshared_key>`
 - Change the name of the default interface (e.g., `enp0s3` or `eth0`) if necessary
 
+Add new sudo user if necessary:
+
+- `sudo adduser letry`
+- `sudo usermod -aG sudo letry`
+- `groups letry`
+
 ## Execution
 
 To install required roles and run the playbook, execute the following commands:
