@@ -27,3 +27,17 @@ To install required roles and run the playbook, execute the following commands:
 ```bash
 ansible-galaxy install -r requirements.yml
 ansible-playbook -i inventory.yml playbooks/vps.yml
+```
+
+## Clients
+
+### Windows
+- https://github.com/MatsuriDayo/nekoray/releases
+
+### iOS, MacOS
+- Streisand
+- V2Box
+
+### Android
+- https://github.com/2dust/v2rayNG
+

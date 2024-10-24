@@ -1,4 +1,5 @@
 hostname: vpnlab
+project_root: /Users/letry/work/projects/vps
 user_name: letry
 user_pass: 1q2w3e4r
 user_pass_service: 1q2w3e4r
